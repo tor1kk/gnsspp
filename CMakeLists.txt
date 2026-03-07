@@ -86,9 +86,6 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
         target_link_libraries(simple_reader PRIVATE gnsspp)
         target_compile_options(simple_reader PRIVATE -Wall -Wextra)
 
-        add_executable(bench_reader examples/bench_reader.cpp)
-        target_link_libraries(bench_reader PRIVATE gnsspp)
-        target_compile_options(bench_reader PRIVATE -Wall -Wextra -O2)
     endif()
 
 endif()
