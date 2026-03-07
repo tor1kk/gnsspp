@@ -46,9 +46,7 @@ SerialPort::~SerialPort()
 
 void SerialPort::open(void)
 {
-    /// O_NOCTTY: Dont become terminal controller
-    /// O_NDELAY: Dont block if no DCD(rs232 Data Carrier Detect)
-    fd_ = ::open(path_.c_str(), O_RDWR | O_NOCTTY | O_NDELAY);
+    fd_ = ::open(path_.c_str(), O_RDWR | O_NOCTTY);
 
     if (fd_ < 0) {
         throw IoError(std::string("open failed: ") + strerror(errno));

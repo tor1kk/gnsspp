@@ -29,7 +29,7 @@ static void handle_ubx(const gnsspp::Frame& frame)
                   << "\n";
     } else if (frame.type == "NAV-SAT") {
         auto msg = gnsspp::decode_nav_sat(payload);
-        std::cout << "[NAV-SAT] " << msg.num_svs << " satellites tracked\n";
+        std::cout << "[NAV-SAT] " << static_cast<int>(msg.num_svs) << " satellites tracked\n";
     } else if (frame.type == "NAV-SVIN") {
         auto msg = gnsspp::decode_nav_svin(payload);
         std::cout << "[NAV-SVIN] dur=" << msg.dur << "s"
