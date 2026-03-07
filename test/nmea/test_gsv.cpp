@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "gnsspp/parsers/nmea/gsv.hpp"
+#include "gnsspp/nmea/gsv.hpp"
 
 
 class GSVTest : public ::testing::Test {

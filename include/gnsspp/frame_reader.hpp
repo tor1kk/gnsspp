@@ -4,9 +4,9 @@
 #include <optional>
 #include <vector>
 
-#include "gnsspp/ports/port.hpp"
+#include "gnsspp/port.hpp"
 #include "gnsspp/frame.hpp"
-#include "gnsspp/parsers/iparser.hpp"
+#include "gnsspp/iparser.hpp"
 
 
 namespace gnsspp {

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "gnsspp/parsers/ubx/rxm_rtcm.hpp"
+#include "gnsspp/ubx/rxm_rtcm.hpp"
 
 
 class RxmRtcmTest : public ::testing::Test {

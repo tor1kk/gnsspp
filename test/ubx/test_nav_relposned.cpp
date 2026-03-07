@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "gnsspp/parsers/ubx/nav_relposned.hpp"
+#include "gnsspp/ubx/nav_relposned.hpp"
 
 
 class NavRelPosNedTest : public ::testing::Test {

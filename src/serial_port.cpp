@@ -8,7 +8,7 @@
 #include <poll.h>
 
 #include "gnsspp/error.hpp"
-#include "gnsspp/ports/serial_port.hpp"
+#include "gnsspp/serial_port.hpp"
 
 
 namespace gnsspp {
@@ -126,6 +126,17 @@ size_t SerialPort::read(uint8_t* buf, size_t len)
     int ret = ::read(fd_, buf, len);
     if (ret < 0) {
         throw IoError(std::string("read failed: ") + strerror(errno));
+    }
+
+    return static_cast<size_t>(ret);
+}
+
+
+size_t SerialPort::write(const uint8_t* buf, size_t len)
+{
+    int ret = ::write(fd_, buf, len);
+    if (ret < 0) {
+        throw IoError(std::string("write failed: ") + strerror(errno));
     }
 
     return static_cast<size_t>(ret);

@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "gnsspp/parsers/nmea/rmc.hpp"
+#include "gnsspp/nmea/rmc.hpp"
 
 
 class RMCTest : public ::testing::Test {

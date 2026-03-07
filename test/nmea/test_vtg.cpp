@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "gnsspp/parsers/nmea/vtg.hpp"
+#include "gnsspp/nmea/vtg.hpp"
 
 
 class VTGTest : public ::testing::Test {

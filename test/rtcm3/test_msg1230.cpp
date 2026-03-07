@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 
-#include "gnsspp/parsers/rtcm3/msg1230.hpp"
+#include "gnsspp/rtcm3/msg1230.hpp"
 #include "rtcm3/bit_writer.hpp"
 
 

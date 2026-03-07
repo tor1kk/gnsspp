@@ -3,7 +3,7 @@
 #include <vector>
 #include <stdexcept>
 
-#include "gnsspp/ports/port.hpp"
+#include "gnsspp/port.hpp"
 
 
 class MockPort : public gnsspp::Port {
@@ -44,6 +44,14 @@ public:
         return counter;
     }
 
+    size_t write(const uint8_t* buf, size_t len) override {
+        written_.insert(written_.end(), buf, buf + len);
+        return len;
+    }
+
+    const std::vector<uint8_t>& written() const { return written_; }
+
 private:
    std::vector<uint8_t> buffer_;
+   std::vector<uint8_t> written_;
 };

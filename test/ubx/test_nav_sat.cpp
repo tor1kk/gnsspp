@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "gnsspp/parsers/ubx/nav_sat.hpp"
+#include "gnsspp/ubx/nav_sat.hpp"
 
 
 class NavSatTest : public ::testing::Test {

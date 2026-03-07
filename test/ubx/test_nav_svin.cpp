@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "gnsspp/parsers/ubx/nav_svin.hpp"
+#include "gnsspp/ubx/nav_svin.hpp"
 
 
 class NavSvInTest : public ::testing::Test {

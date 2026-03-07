@@ -2,7 +2,7 @@
 #include <vector>
 #include <stdexcept>
 
-#include "gnsspp/parsers/rtcm3_parser.hpp"
+#include "gnsspp/rtcm3/rtcm3_parser.hpp"
 #include "mock_port.hpp"
 
 

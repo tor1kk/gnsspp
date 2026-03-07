@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "gnsspp/parsers/nmea/gga.hpp"
+#include "gnsspp/nmea/gga.hpp"
 
 
 class GGATest : public ::testing::Test {

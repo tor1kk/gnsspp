@@ -1,7 +1,7 @@
 #include <gtest/gtest.h>
 #include <cmath>
 
-#include "gnsspp/parsers/rtcm3/msm4.hpp"
+#include "gnsspp/rtcm3/msm4.hpp"
 #include "rtcm3/bit_writer.hpp"
 
 

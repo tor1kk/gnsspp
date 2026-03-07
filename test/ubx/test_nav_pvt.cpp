@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "gnsspp/parsers/ubx/nav_pvt.hpp"
+#include "gnsspp/ubx/nav_pvt.hpp"
 
 
 class NavPvtTest : public ::testing::Test {
