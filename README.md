@@ -24,7 +24,7 @@ include(FetchContent)
 FetchContent_Declare(
     gnsspp
     GIT_REPOSITORY https://github.com/tor1kk/gnsspp.git
-    GIT_TAG        v0.1.0
+    GIT_TAG        main
 )
 FetchContent_MakeAvailable(gnsspp)
 
