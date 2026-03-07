@@ -2,9 +2,6 @@
 
 A lightweight C++17 library for parsing GNSS protocol frames — UBX, NMEA, and RTCM3.
 
-Designed for embedded Linux systems (tested on AM335x Cortex-A8) where Python-based
-parsing is too CPU-intensive.
-
 ## Supported messages
 
 | Protocol | Messages |
