@@ -1,13 +1,13 @@
 #pragma once
 
-#include "gnsspp/iparser.hpp"
+#include "gnsspp/parser.hpp"
 
 
 namespace gnsspp {
 
 /// Parser for NMEA 0183 sentences.
 /// Frame layout: '$' <talker(2)> <type(3)> ',' <fields> '*' <cksum(2)> '\r' '\n'
-class NMEAParser : public IParser {
+class NMEAParser : public Parser {
 public:
     /// Returns true for b1 == '$' (NMEA sentence start); b2 is the first
     /// talker-ID character and is not checked (can be 'G', 'P', etc.).

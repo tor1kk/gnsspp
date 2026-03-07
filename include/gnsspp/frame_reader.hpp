@@ -6,7 +6,7 @@
 
 #include "gnsspp/port.hpp"
 #include "gnsspp/frame.hpp"
-#include "gnsspp/iparser.hpp"
+#include "gnsspp/parser.hpp"
 
 
 namespace gnsspp {
@@ -19,7 +19,7 @@ public:
     explicit FrameReader(Port& port);
 
     /// Register a parser for a specific protocol (UBX, NMEA, RTCM, ...).
-    void add_parser(std::unique_ptr<IParser> parser);
+    void add_parser(std::unique_ptr<Parser> parser);
 
     /// Read one complete frame from the port.
     /// @param timeout_ms  max wait for the first (preamble) byte; -1 = forever.
@@ -29,7 +29,7 @@ public:
 
 private:
     Port& port_;
-    std::vector<std::unique_ptr<IParser>> parsers_;
+    std::vector<std::unique_ptr<Parser>> parsers_;
 };
 
 } // namespace gnsspp

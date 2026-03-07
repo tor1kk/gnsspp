@@ -13,7 +13,7 @@
 #include "gnsspp/serial_port.hpp"
 
 // Protocol parsers (frame-level)
-#include "gnsspp/iparser.hpp"
+#include "gnsspp/parser.hpp"
 #include "gnsspp/ubx/ubx_parser.hpp"
 #include "gnsspp/nmea/nmea_parser.hpp"
 #include "gnsspp/rtcm3/rtcm3_parser.hpp"

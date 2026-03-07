@@ -13,7 +13,7 @@ FrameReader::FrameReader(Port& port)
 }
 
 
-void FrameReader::add_parser(std::unique_ptr<IParser> parser)
+void FrameReader::add_parser(std::unique_ptr<Parser> parser)
 {
     parsers_.push_back(std::move(parser));
 }

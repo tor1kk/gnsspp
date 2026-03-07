@@ -8,9 +8,9 @@
 
 namespace gnsspp {
 
-class IParser {
+class Parser {
 public:
-    virtual ~IParser() = default;
+    virtual ~Parser() = default;
 
     /// Returns true if this parser handles frames starting with @p b1, @p b2.
     /// Both bytes have already been consumed from the port.
