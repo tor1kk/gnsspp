@@ -44,6 +44,8 @@ Frame NMEAParser::parse(Port& port, uint8_t b1, uint8_t b2)
         sentence += static_cast<char>(c);
         if (c == '\n') break;
     }
+    if (sentence.back() != '\n')
+        throw ParseError("NMEA: sentence too long");
 
     // Locate checksum delimiter '*'
     size_t star = sentence.rfind('*');
@@ -75,8 +77,9 @@ Frame NMEAParser::parse(Port& port, uint8_t b1, uint8_t b2)
     frame.raw.assign(sentence.begin(), sentence.end());
     frame.protocol       = "NMEA";
     frame.type           = type;
+    // NMEA has no separate binary payload — use frame.raw directly.
     frame.payload_offset = 0;
-    frame.payload_size   = static_cast<uint16_t>(frame.raw.size());
+    frame.payload_size   = 0;
 
     return frame;
 }

@@ -36,7 +36,7 @@ public:
     }
 
 private:
-    const std::vector<uint8_t>& data_;
+    const std::vector<uint8_t> data_;
     size_t                       bit_pos_;
 };
 

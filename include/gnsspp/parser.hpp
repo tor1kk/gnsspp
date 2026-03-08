@@ -19,7 +19,7 @@ public:
     /// Read and parse a complete frame from @p port.
     /// Both sync bytes @p b1 and @p b2 have already been consumed.
     /// @throws gnsspp::ParseError on malformed frame; gnsspp::IoError on I/O error.
-    virtual struct Frame parse(Port& port, uint8_t b1, uint8_t b2) = 0;
+    virtual Frame parse(Port& port, uint8_t b1, uint8_t b2) = 0;
 };
 
 } // namespace gnsspp

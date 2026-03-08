@@ -22,9 +22,9 @@ public:
     void add_parser(std::unique_ptr<Parser> parser);
 
     /// Read one complete frame from the port.
-    /// @param timeout_ms  max wait for the first (preamble) byte; -1 = forever.
+    /// @param timeout_ms  global deadline for the entire call in milliseconds; -1 = wait forever.
     /// @return parsed frame, or std::nullopt on timeout.
-    /// @throws gnsspp::IoError on I/O error; gnsspp::ParseError on unrecognised preamble.
+    /// @throws gnsspp::IoError on I/O error; gnsspp::ParseError on malformed frame.
     std::optional<Frame> read_frame(int timeout_ms = -1);
 
 private:

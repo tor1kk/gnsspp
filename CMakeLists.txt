@@ -8,7 +8,33 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 # ---- Library target ---------------------------------------------------------
 
-file(GLOB_RECURSE GNSSPP_SOURCES src/*.cpp)
+set(GNSSPP_SOURCES
+    src/serial_port.cpp
+    src/frame_reader.cpp
+    src/ubx/ubx_parser.cpp
+    src/ubx/nav_parser.cpp
+    src/ubx/nav_pvt.cpp
+    src/ubx/nav_sat.cpp
+    src/ubx/nav_svin.cpp
+    src/ubx/nav_relposned.cpp
+    src/ubx/rxm_parser.cpp
+    src/ubx/rxm_rtcm.cpp
+    src/ubx/cfg_valset.cpp
+    src/ubx/cfg_rst.cpp
+    src/ubx/ack.cpp
+    src/nmea/nmea_parser.cpp
+    src/nmea/gga.cpp
+    src/nmea/rmc.cpp
+    src/nmea/gsa.cpp
+    src/nmea/gsv.cpp
+    src/nmea/vtg.cpp
+    src/rtcm3/rtcm3_parser.cpp
+    src/rtcm3/bit_reader.cpp
+    src/rtcm3/msg1005.cpp
+    src/rtcm3/msg1006.cpp
+    src/rtcm3/msg1230.cpp
+    src/rtcm3/msm4.cpp
+)
 add_library(gnsspp ${GNSSPP_SOURCES})
 add_library(gnsspp::gnsspp ALIAS gnsspp)
 
@@ -57,7 +83,7 @@ install(FILES
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
-    option(GNSSPP_BUILD_TESTS    "Build tests"    ON)
+    option(GNSSPP_BUILD_TESTS    "Build tests"    OFF)
     option(GNSSPP_BUILD_EXAMPLES "Build examples" ON)
 
     if(GNSSPP_BUILD_TESTS)

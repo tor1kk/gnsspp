@@ -25,17 +25,6 @@ bool UBXParser::matches(uint8_t b1, uint8_t b2) const
 }
 
 
-void UBXParser::calc_checksum(const uint8_t* data, size_t len,
-                              uint8_t& ck_a, uint8_t& ck_b)
-{
-    ck_a = 0;
-    ck_b = 0;
-    for (size_t i = 0; i < len; ++i) {
-        ck_a += data[i];
-        ck_b += ck_a;
-    }
-}
-
 
 Frame UBXParser::parse(Port& port, uint8_t b1, uint8_t b2)
 {
@@ -66,16 +55,15 @@ Frame UBXParser::parse(Port& port, uint8_t b1, uint8_t b2)
     uint8_t rx_ck_b = port.read_byte();
 
     // Verify Fletcher-8 checksum over [class, id, len_lo, len_hi, payload...]
-    std::vector<uint8_t> chk_data;
-    chk_data.reserve(4 + payload_len);
-    chk_data.push_back(msg_class);
-    chk_data.push_back(msg_id);
-    chk_data.push_back(len_lo);
-    chk_data.push_back(len_hi);
-    chk_data.insert(chk_data.end(), payload.begin(), payload.end());
-
-    uint8_t calc_a, calc_b;
-    calc_checksum(chk_data.data(), chk_data.size(), calc_a, calc_b);
+    uint8_t calc_a = 0, calc_b = 0;
+    for (uint8_t b : {msg_class, msg_id, len_lo, len_hi}) {
+        calc_a += b;
+        calc_b += calc_a;
+    }
+    for (uint8_t b : payload) {
+        calc_a += b;
+        calc_b += calc_a;
+    }
 
     if (calc_a != rx_ck_a || calc_b != rx_ck_b) {
         throw ParseError("UBX: checksum mismatch");

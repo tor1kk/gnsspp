@@ -46,6 +46,9 @@ SerialPort::~SerialPort()
 
 void SerialPort::open(void)
 {
+    if (fd_ != -1)
+        throw IoError("port already open");
+
     fd_ = ::open(path_.c_str(), O_RDWR | O_NOCTTY);
 
     if (fd_ < 0) {
@@ -54,6 +57,8 @@ void SerialPort::open(void)
 
     struct termios tty{};
     if (tcgetattr(fd_, &tty) != 0) {
+        ::close(fd_);
+        fd_ = -1;
         throw IoError(std::string("tcgetattr: ") + strerror(errno));
     }
 
@@ -75,6 +80,8 @@ void SerialPort::open(void)
     tty.c_cc[VTIME] = 0;   // no timeout
 
     if (tcsetattr(fd_, TCSANOW, &tty) != 0) {
+        ::close(fd_);
+        fd_ = -1;
         throw IoError(std::string("tcsetattr: ") + strerror(errno));
     }
 
@@ -84,6 +91,7 @@ void SerialPort::open(void)
 
 void SerialPort::close(void)
 {
+    if (fd_ == -1) return;
     ::close(fd_);
     fd_ = -1;
 }
@@ -113,9 +121,10 @@ uint8_t SerialPort::read_byte(void)
     uint8_t tmp = 0;
 
     int ret = ::read(fd_, &tmp, 1);
-    if (ret < 0) {
+    if (ret < 0)
         throw IoError(std::string("read failed: ") + strerror(errno));
-    }
+    if (ret == 0)
+        throw IoError("read failed: EOF");
 
     return tmp;
 }
