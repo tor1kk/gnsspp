@@ -43,7 +43,10 @@ target_include_directories(gnsspp PUBLIC
     $<INSTALL_INTERFACE:include>
 )
 target_compile_options(gnsspp PRIVATE -Wall -Wextra)
-set_target_properties(gnsspp PROPERTIES VERSION ${PROJECT_VERSION})
+set_target_properties(gnsspp PROPERTIES
+    VERSION ${PROJECT_VERSION}
+    POSITION_INDEPENDENT_CODE ON
+)
 
 # ---- Install ----------------------------------------------------------------
 
