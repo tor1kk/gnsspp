@@ -9,7 +9,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # ---- Library target ---------------------------------------------------------
 
 set(GNSSPP_SOURCES
-    src/serial_port.cpp
     src/frame_reader.cpp
     src/ubx/ubx_parser.cpp
     src/ubx/nav_parser.cpp
@@ -35,6 +34,10 @@ set(GNSSPP_SOURCES
     src/rtcm3/msg1230.cpp
     src/rtcm3/msm4.cpp
 )
+if(UNIX)
+    list(APPEND GNSSPP_SOURCES src/posix_serial_port.cpp)
+endif()
+
 add_library(gnsspp ${GNSSPP_SOURCES})
 add_library(gnsspp::gnsspp ALIAS gnsspp)
 

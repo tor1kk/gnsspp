@@ -91,7 +91,7 @@ int main(int argc, char* argv[])
     const std::string device   = argv[1];
     const int         baudrate = std::stoi(argv[2]);
 
-    gnsspp::SerialPort port(device, baudrate);
+    gnsspp::PosixSerialPort port(device, baudrate);
 
     try {
         port.open();

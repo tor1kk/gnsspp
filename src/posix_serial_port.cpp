@@ -3,18 +3,18 @@
 
 #include <fcntl.h>
 #include <errno.h>
-#include <unistd.h>  
+#include <unistd.h>
 #include <termios.h>
 #include <poll.h>
 
 #include "gnsspp/error.hpp"
-#include "gnsspp/serial_port.hpp"
+#include "gnsspp/posix_serial_port.hpp"
 
 
 namespace gnsspp {
 namespace {
 
-speed_t to_baud(int baud) 
+speed_t to_baud(int baud)
 {
     switch (baud) {
         case 9600:   return B9600;
@@ -29,14 +29,14 @@ speed_t to_baud(int baud)
 } // static namespace
 
 
-SerialPort::SerialPort(const std::string& path, int baudrate)
+PosixSerialPort::PosixSerialPort(const std::string& path, int baudrate)
     : path_(path), baudrate_(baudrate), fd_(-1)
 {
 
 }
 
 
-SerialPort::~SerialPort()
+PosixSerialPort::~PosixSerialPort()
 {
     if (fd_ != -1) {
         ::close(fd_);
@@ -44,7 +44,7 @@ SerialPort::~SerialPort()
 }
 
 
-void SerialPort::open(void)
+void PosixSerialPort::open(void)
 {
     if (fd_ != -1)
         throw IoError("port already open");
@@ -63,8 +63,8 @@ void SerialPort::open(void)
     }
 
     speed_t speed = to_baud(baudrate_);
-    cfsetispeed(&tty, speed);    
-    cfsetospeed(&tty, speed);    
+    cfsetispeed(&tty, speed);
+    cfsetospeed(&tty, speed);
 
     tty.c_cflag &= ~PARENB;       // No parity
     tty.c_cflag &= ~CSTOPB;       // 1 stop-bit
@@ -89,7 +89,7 @@ void SerialPort::open(void)
 }
 
 
-void SerialPort::close(void)
+void PosixSerialPort::close(void)
 {
     if (fd_ == -1) return;
     ::close(fd_);
@@ -97,13 +97,13 @@ void SerialPort::close(void)
 }
 
 
-bool SerialPort::is_open(void) const
+bool PosixSerialPort::is_open(void) const
 {
     return fd_ != -1;
 }
 
 
-bool SerialPort::wait_readable(int timeout_ms)
+bool PosixSerialPort::wait_readable(int timeout_ms)
 {
     struct pollfd pfd{};
     pfd.fd     = fd_;
@@ -116,7 +116,7 @@ bool SerialPort::wait_readable(int timeout_ms)
 }
 
 
-uint8_t SerialPort::read_byte(void)
+uint8_t PosixSerialPort::read_byte(void)
 {
     uint8_t tmp = 0;
 
@@ -130,7 +130,7 @@ uint8_t SerialPort::read_byte(void)
 }
 
 
-size_t SerialPort::read(uint8_t* buf, size_t len)
+size_t PosixSerialPort::read(uint8_t* buf, size_t len)
 {
     int ret = ::read(fd_, buf, len);
     if (ret < 0) {
@@ -141,7 +141,7 @@ size_t SerialPort::read(uint8_t* buf, size_t len)
 }
 
 
-size_t SerialPort::write(const uint8_t* buf, size_t len)
+size_t PosixSerialPort::write(const uint8_t* buf, size_t len)
 {
     int ret = ::write(fd_, buf, len);
     if (ret < 0) {

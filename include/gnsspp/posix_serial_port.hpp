@@ -6,13 +6,13 @@
 
 namespace gnsspp {
 
-/// GNSS port backed by a UART/RS-232 device (termios).
-class SerialPort: public Port {
+/// GNSS port backed by a UART/RS-232 device (termios, POSIX only).
+class PosixSerialPort: public Port {
 public:
     /// @param path      device path, e.g. "/dev/ttyUSB0"
     /// @param baudrate  baud rate, e.g. 115200
-    SerialPort(const std::string& path, int baudrate);
-    ~SerialPort() override;
+    PosixSerialPort(const std::string& path, int baudrate);
+    ~PosixSerialPort() override;
 
     void open() override;
     void close() override;
