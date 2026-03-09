@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches: [main]       
+  pull_request:
+    branches: [main]       
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure
+        run: cmake -S . -B build -DGNSSPP_BUILD_TESTS=ON -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --parallel
+
+      - name: Test
+        run: ./build/gnsspp_test
