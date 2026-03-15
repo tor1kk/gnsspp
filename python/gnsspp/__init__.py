@@ -28,6 +28,8 @@ class SerialPort(Port):
             self._s = path_or_serial
         else:
             self._s = _serial.Serial(path_or_serial, baudrate, timeout=1)
+        self._buf: bytes = b''
+        self._buf_pos: int = 0
 
     def open(self):
         if not self._s.is_open:
@@ -44,10 +46,16 @@ class SerialPort(Port):
         return bool(r)
 
     def read_byte(self) -> int:
-        data = self._s.read(1)
-        if not data:
-            raise IoError("Serial read timeout")
-        return data[0]
+        # Drain in_waiting bytes in one read() call to avoid one Python call per byte.
+        if self._buf_pos >= len(self._buf):
+            n = max(1, self._s.in_waiting)
+            self._buf = self._s.read(n)
+            self._buf_pos = 0
+            if not self._buf:
+                raise IoError("Serial read timeout")
+        b = self._buf[self._buf_pos]
+        self._buf_pos += 1
+        return b
 
     def write(self, data: bytes) -> int:
         return self._s.write(data)
