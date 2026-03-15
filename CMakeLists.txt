@@ -19,7 +19,6 @@ set(GNSSPP_SOURCES
     src/ubx/nav_hpposllh.cpp
     src/ubx/nav_status.cpp
     src/ubx/rxm_parser.cpp
-    src/decode.cpp
     src/ubx/rxm_rtcm.cpp
     src/ubx/cfg_valset.cpp
     src/ubx/cfg_rst.cpp

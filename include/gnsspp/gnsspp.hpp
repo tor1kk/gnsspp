@@ -39,9 +39,6 @@
 #include "gnsspp/nmea/gsv.hpp"
 #include "gnsspp/nmea/vtg.hpp"
 
-// Typed dispatch
-#include "gnsspp/message.hpp"
-
 // RTCM3 messages
 #include "gnsspp/rtcm3/msg1005.hpp"
 #include "gnsspp/rtcm3/msg1006.hpp"
