@@ -39,7 +39,9 @@ PosixSerialPort::PosixSerialPort(const std::string& path, int baudrate)
 PosixSerialPort::~PosixSerialPort()
 {
     if (fd_ != -1) {
-        ::close(fd_);
+        int fd = fd_;
+        fd_ = -1;
+        ::close(fd);
     }
 }
 
@@ -109,7 +111,11 @@ bool PosixSerialPort::wait_readable(int timeout_ms)
     pfd.fd     = fd_;
     pfd.events = POLLIN;
 
-    int ret = poll(&pfd, 1, timeout_ms);
+    int ret;
+    do {
+        ret = poll(&pfd, 1, timeout_ms);
+    } while (ret < 0 && errno == EINTR);
+
     if (ret < 0)
         throw IoError(std::string("poll: ") + strerror(errno));
     return ret > 0;
