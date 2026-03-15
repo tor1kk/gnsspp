@@ -1,9 +1,57 @@
 from ._gnsspp import *
 from ._gnsspp import (
-    Frame, SerialPort, FrameReader,
+    Frame, FrameReader,
     UBXParser, NMEAParser, RTCM3Parser,
     ParseError, IoError,
 )
+
+import select as _select
+import serial as _serial
+
+
+class SerialPort(Port):
+    """Cross-platform gnsspp.Port backed by a pyserial Serial instance.
+
+    Can be constructed from a device path + baud rate, or from an
+    already-opened serial.Serial object.
+
+    Example::
+
+        port = gnsspp.SerialPort("/dev/ttyACM0", 38400)
+        for msg in gnsspp.frames(port):
+            ...
+    """
+
+    def __init__(self, path_or_serial, baudrate: int = 0):
+        super().__init__()
+        if isinstance(path_or_serial, _serial.Serial):
+            self._s = path_or_serial
+        else:
+            self._s = _serial.Serial(path_or_serial, baudrate, timeout=1)
+
+    def open(self):
+        if not self._s.is_open:
+            self._s.open()
+
+    def close(self):
+        self._s.close()
+
+    def is_open(self) -> bool:
+        return self._s.is_open
+
+    def wait_readable(self, timeout_ms: int) -> bool:
+        r, _, _ = _select.select([self._s.fileno()], [], [], timeout_ms / 1000.0)
+        return bool(r)
+
+    def read_byte(self) -> int:
+        data = self._s.read(1)
+        if not data:
+            raise IoError("Serial read timeout")
+        return data[0]
+
+    def write(self, data: bytes) -> int:
+        return self._s.write(data)
+
 
 # ── dispatch tables ───────────────────────────────────────────────────────────
 

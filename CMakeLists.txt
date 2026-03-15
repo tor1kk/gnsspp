@@ -21,7 +21,9 @@ set(GNSSPP_SOURCES
     src/ubx/rxm_parser.cpp
     src/ubx/rxm_rtcm.cpp
     src/ubx/cfg_valset.cpp
+    src/ubx/cfg_valget.cpp
     src/ubx/cfg_rst.cpp
+    src/ubx/ubx_poll.cpp
     src/ubx/ack.cpp
     src/nmea/nmea_parser.cpp
     src/nmea/gga.cpp
@@ -30,6 +32,7 @@ set(GNSSPP_SOURCES
     src/nmea/gsv.cpp
     src/nmea/vtg.cpp
     src/rtcm3/rtcm3_parser.cpp
+    src/rtcm3/rtcm3_framer.cpp
     src/rtcm3/bit_reader.cpp
     src/rtcm3/msg1005.cpp
     src/rtcm3/msg1006.cpp
@@ -99,9 +102,6 @@ set(GNSSPP_BINDING_SOURCES
 )
 
 if(SKBUILD)
-    if(NOT UNIX)
-        message(FATAL_ERROR "gnsspp-py: Windows builds are not yet supported")
-    endif()
     find_package(pybind11 REQUIRED)
     pybind11_add_module(_gnsspp ${GNSSPP_BINDING_SOURCES})
     target_link_libraries(_gnsspp PRIVATE gnsspp)
@@ -118,7 +118,7 @@ if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
     option(GNSSPP_BUILD_EXAMPLES "Build examples" ON)
     option(GNSSPP_BUILD_PYTHON   "Build Python bindings" OFF)
 
-    if(GNSSPP_BUILD_PYTHON AND UNIX)
+    if(GNSSPP_BUILD_PYTHON)
         find_package(pybind11 REQUIRED)
         pybind11_add_module(_gnsspp ${GNSSPP_BINDING_SOURCES})
         target_link_libraries(_gnsspp PRIVATE gnsspp)

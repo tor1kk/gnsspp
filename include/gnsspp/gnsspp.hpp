@@ -29,7 +29,9 @@
 #include "gnsspp/ubx/nav_relposned.hpp"
 #include "gnsspp/ubx/rxm_rtcm.hpp"
 #include "gnsspp/ubx/cfg_valset.hpp"
+#include "gnsspp/ubx/cfg_valget.hpp"
 #include "gnsspp/ubx/cfg_rst.hpp"
+#include "gnsspp/ubx/ubx_poll.hpp"
 #include "gnsspp/ubx/ack.hpp"
 
 // NMEA messages
@@ -40,6 +42,7 @@
 #include "gnsspp/nmea/vtg.hpp"
 
 // RTCM3 messages
+#include "gnsspp/rtcm3/rtcm3_framer.hpp"
 #include "gnsspp/rtcm3/msg1005.hpp"
 #include "gnsspp/rtcm3/msg1006.hpp"
 #include "gnsspp/rtcm3/msm4.hpp"
