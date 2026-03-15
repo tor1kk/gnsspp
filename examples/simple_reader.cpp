@@ -15,68 +15,50 @@
 #include "gnsspp/gnsspp.hpp"
 
 
-static void handle_ubx(const gnsspp::Frame& frame)
+static void handle(const gnsspp::Message& msg)
 {
-    auto payload = frame.payload();
+    std::visit([](auto&& m) {
+        using T = std::decay_t<decltype(m)>;
 
-    if (frame.type == "NAV-PVT") {
-        auto msg = gnsspp::decode_nav_pvt(payload);
-        std::cout << "[NAV-PVT] fix=" << static_cast<int>(msg.fix_type)
-                  << " lat=" << msg.lat << " lon=" << msg.lon
-                  << " alt=" << msg.height / 1000.0 << "m"
-                  << " numSV=" << static_cast<int>(msg.num_sv)
-                  << " carrSoln=" << static_cast<int>(msg.carr_soln)
-                  << "\n";
-    } else if (frame.type == "NAV-SAT") {
-        auto msg = gnsspp::decode_nav_sat(payload);
-        std::cout << "[NAV-SAT] " << static_cast<int>(msg.num_svs) << " satellites tracked\n";
-    } else if (frame.type == "NAV-SVIN") {
-        auto msg = gnsspp::decode_nav_svin(payload);
-        std::cout << "[NAV-SVIN] dur=" << msg.dur << "s"
-                  << " valid=" << msg.valid
-                  << " acc=" << msg.mean_acc_m * 1000.0 << "mm\n";
-    } else if (!frame.type.empty()) {
-        std::cout << "[UBX] unhandled type=" << frame.type << "\n";
-    }
-    // frame.type.empty() → unknown id, silently skip
-}
+        if constexpr (std::is_same_v<T, gnsspp::NavPvt>) {
+            const char* carr[] = {"none", "float", "fixed"};
+            std::cout << "[NAV-PVT]  fix=" << static_cast<int>(m.fix_type)
+                      << " lat=" << m.lat << " lon=" << m.lon
+                      << " alt=" << m.height / 1000.0 << "m"
+                      << " numSV=" << static_cast<int>(m.num_sv)
+                      << " RTK=" << carr[m.carr_soln] << "\n";
 
-static void handle_nmea(const gnsspp::Frame& frame)
-{
-    std::string sentence(frame.raw.begin(), frame.raw.end());
+        } else if constexpr (std::is_same_v<T, gnsspp::NavHpPosLlh>) {
+            if (!m.invalid_llh)
+                std::cout << "[HPPOSLLH] lat=" << m.lat << " lon=" << m.lon
+                          << " hAcc=" << m.h_acc << "mm vAcc=" << m.v_acc << "mm\n";
 
-    if (frame.type == "GGA") {
-        auto msg = gnsspp::decode_gga(sentence);
-        std::cout << "[GGA] fix=" << static_cast<int>(msg.fix_quality)
-                  << " lat=" << msg.lat << " lon=" << msg.lon
-                  << " alt=" << msg.alt_m << "m"
-                  << " numSV=" << static_cast<int>(msg.num_sv)
-                  << "\n";
-    } else if (frame.type == "RMC") {
-        auto msg = gnsspp::decode_rmc(sentence);
-        std::cout << "[RMC] active=" << msg.active
-                  << " lat=" << msg.lat << " lon=" << msg.lon
-                  << " speed=" << msg.speed_knots << "kt\n";
-    }
-    // other NMEA types: skip
-}
+        } else if constexpr (std::is_same_v<T, gnsspp::NavSvIn>) {
+            std::cout << "[NAV-SVIN] dur=" << m.dur << "s"
+                      << " valid=" << m.valid
+                      << " acc=" << m.mean_acc_m * 1000.0 << "mm\n";
 
-static void handle_rtcm3(const gnsspp::Frame& frame)
-{
-    auto payload = frame.payload();
+        } else if constexpr (std::is_same_v<T, gnsspp::NavSat>) {
+            std::cout << "[NAV-SAT]  " << static_cast<int>(m.num_svs)
+                      << " satellites\n";
 
-    if (frame.type == "1005") {
-        auto msg = gnsspp::decode_msg1005(payload);
-        std::cout << "[RTCM 1005] station=" << msg.station_id
-                  << " X=" << msg.ecef_x << " Y=" << msg.ecef_y
-                  << " Z=" << msg.ecef_z << " m\n";
-    } else if (frame.type == "1074" || frame.type == "1084"
-            || frame.type == "1094" || frame.type == "1124") {
-        auto msg = gnsspp::decode_msm4(payload);
-        std::cout << "[RTCM " << frame.type << "] station=" << msg.station_id
-                  << " sats=" << msg.satellites.size()
-                  << " signals=" << msg.signals.size() << "\n";
-    }
+        } else if constexpr (std::is_same_v<T, gnsspp::NmeaGga>) {
+            std::cout << "[GGA] fix=" << static_cast<int>(m.fix_quality)
+                      << " lat=" << m.lat << " lon=" << m.lon
+                      << " alt=" << m.alt_m << "m"
+                      << " numSV=" << static_cast<int>(m.num_sv) << "\n";
+
+        } else if constexpr (std::is_same_v<T, gnsspp::Msg1005>) {
+            std::cout << "[RTCM 1005] station=" << m.station_id
+                      << " X=" << m.ecef_x << " Y=" << m.ecef_y
+                      << " Z=" << m.ecef_z << " m\n";
+
+        } else if constexpr (std::is_same_v<T, gnsspp::Msm4>) {
+            std::cout << "[RTCM " << m.msg_type << "] station=" << m.station_id
+                      << " sats=" << m.satellites.size()
+                      << " signals=" << m.signals.size() << "\n";
+        }
+    }, msg);
 }
 
 
@@ -88,15 +70,12 @@ int main(int argc, char* argv[])
         return EXIT_FAILURE;
     }
 
-    const std::string device   = argv[1];
-    const int         baudrate = std::stoi(argv[2]);
-
-    gnsspp::PosixSerialPort port(device, baudrate);
+    gnsspp::PosixSerialPort port(argv[1], std::stoi(argv[2]));
 
     try {
         port.open();
     } catch (const gnsspp::IoError& e) {
-        std::cerr << "Failed to open " << device << ": " << e.what() << "\n";
+        std::cerr << "Failed to open " << argv[1] << ": " << e.what() << "\n";
         return EXIT_FAILURE;
     }
 
@@ -105,23 +84,20 @@ int main(int argc, char* argv[])
     reader.add_parser(std::make_unique<gnsspp::NMEAParser>());
     reader.add_parser(std::make_unique<gnsspp::RTCM3Parser>());
 
-    std::cout << "Reading from " << device << " at " << baudrate << " baud...\n";
+    std::cout << "Reading from " << argv[1] << " at " << argv[2] << " baud...\n";
 
     while (true) {
         try {
             auto frame = reader.read_frame();
-            if (!frame) continue;  // timeout with no data
+            if (!frame) continue;
 
-            if      (frame->protocol == "UBX")   handle_ubx(*frame);
-            else if (frame->protocol == "NMEA")  handle_nmea(*frame);
-            else if (frame->protocol == "RTCM3") handle_rtcm3(*frame);
+            if (auto msg = gnsspp::decode(*frame))
+                handle(*msg);
 
         } catch (const gnsspp::ParseError& e) {
-            // Malformed frame — log and keep going
-            std::cerr << "[WARN] parse error: " << e.what() << "\n";
+            std::cerr << "[WARN] " << e.what() << "\n";
         } catch (const gnsspp::IoError& e) {
-            // Port problem — likely unrecoverable
-            std::cerr << "[ERROR] I/O error: " << e.what() << "\n";
+            std::cerr << "[ERROR] " << e.what() << "\n";
             break;
         }
     }
