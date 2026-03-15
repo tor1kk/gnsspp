@@ -2,6 +2,8 @@
 #include <pybind11/stl.h>
 
 #include "gnsspp/ubx/nav_pvt.hpp"
+#include "gnsspp/ubx/nav_hpposllh.hpp"
+#include "gnsspp/ubx/nav_status.hpp"
 #include "gnsspp/ubx/nav_sat.hpp"
 #include "gnsspp/ubx/nav_svin.hpp"
 #include "gnsspp/ubx/nav_relposned.hpp"
@@ -138,5 +140,33 @@ void bind_ubx(py::module_& m)
 
     m.def("decode_rxm_rtcm", [](py::bytes b) {
         return gnsspp::decode_rxm_rtcm(bytes_to_vec(b));
+    }, py::arg("payload"));
+
+    py::class_<gnsspp::NavHpPosLlh>(m, "NavHpPosLlh")
+        .def_readonly("itow",        &gnsspp::NavHpPosLlh::itow)
+        .def_readonly("invalid_llh", &gnsspp::NavHpPosLlh::invalid_llh)
+        .def_readonly("lon",         &gnsspp::NavHpPosLlh::lon)
+        .def_readonly("lat",         &gnsspp::NavHpPosLlh::lat)
+        .def_readonly("height",      &gnsspp::NavHpPosLlh::height)
+        .def_readonly("h_msl",       &gnsspp::NavHpPosLlh::h_msl)
+        .def_readonly("h_acc",       &gnsspp::NavHpPosLlh::h_acc)
+        .def_readonly("v_acc",       &gnsspp::NavHpPosLlh::v_acc);
+
+    m.def("decode_nav_hpposllh", [](py::bytes b) {
+        return gnsspp::decode_nav_hpposllh(bytes_to_vec(b));
+    }, py::arg("payload"));
+
+    py::class_<gnsspp::NavStatus>(m, "NavStatus")
+        .def_readonly("itow",             &gnsspp::NavStatus::itow)
+        .def_readonly("gps_fix",          &gnsspp::NavStatus::gps_fix)
+        .def_readonly("gps_fix_ok",       &gnsspp::NavStatus::gps_fix_ok)
+        .def_readonly("diff_soln",        &gnsspp::NavStatus::diff_soln)
+        .def_readonly("carr_soln_valid",  &gnsspp::NavStatus::carr_soln_valid)
+        .def_readonly("carr_soln",        &gnsspp::NavStatus::carr_soln)
+        .def_readonly("ttff",             &gnsspp::NavStatus::ttff)
+        .def_readonly("msss",             &gnsspp::NavStatus::msss);
+
+    m.def("decode_nav_status", [](py::bytes b) {
+        return gnsspp::decode_nav_status(bytes_to_vec(b));
     }, py::arg("payload"));
 }

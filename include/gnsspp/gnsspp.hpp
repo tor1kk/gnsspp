@@ -22,6 +22,8 @@
 
 // UBX messages
 #include "gnsspp/ubx/nav_pvt.hpp"
+#include "gnsspp/ubx/nav_hpposllh.hpp"
+#include "gnsspp/ubx/nav_status.hpp"
 #include "gnsspp/ubx/nav_sat.hpp"
 #include "gnsspp/ubx/nav_svin.hpp"
 #include "gnsspp/ubx/nav_relposned.hpp"
