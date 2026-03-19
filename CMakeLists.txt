@@ -90,40 +90,12 @@ install(FILES
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/gnsspp
 )
 
-# ---- Python bindings (scikit-build-core sets SKBUILD=1) ---------------------
-
-set(GNSSPP_BINDING_SOURCES
-    bindings/bindings.cpp
-    bindings/bind_core.cpp
-    bindings/bind_ubx.cpp
-    bindings/bind_nmea.cpp
-    bindings/bind_rtcm3.cpp
-    bindings/bind_cfg.cpp
-)
-
-if(SKBUILD)
-    find_package(pybind11 REQUIRED)
-    pybind11_add_module(_gnsspp ${GNSSPP_BINDING_SOURCES})
-    target_link_libraries(_gnsspp PRIVATE gnsspp)
-    target_compile_options(_gnsspp PRIVATE -Wall -Wextra)
-    # install into gnsspp/ package dir so "import gnsspp" works via __init__.py
-    install(TARGETS _gnsspp DESTINATION gnsspp)
-endif()
-
 # ---- Tests and examples (only when this is the top-level project) -----------
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
 
     option(GNSSPP_BUILD_TESTS    "Build tests"    OFF)
     option(GNSSPP_BUILD_EXAMPLES "Build examples" ON)
-    option(GNSSPP_BUILD_PYTHON   "Build Python bindings" OFF)
-
-    if(GNSSPP_BUILD_PYTHON)
-        find_package(pybind11 REQUIRED)
-        pybind11_add_module(_gnsspp ${GNSSPP_BINDING_SOURCES})
-        target_link_libraries(_gnsspp PRIVATE gnsspp)
-        target_compile_options(_gnsspp PRIVATE -Wall -Wextra)
-    endif()
 
     if(GNSSPP_BUILD_TESTS)
         include(FetchContent)
