@@ -36,7 +36,7 @@ target_link_libraries(my_app PRIVATE gnsspp::gnsspp)
 ```cpp
 #include "gnsspp/gnsspp.hpp"
 
-gnsspp::SerialPort port("/dev/ttyACM0", 38400);
+gnsspp::PosixSerialPort port("/dev/ttyACM0", 38400);
 port.open();
 
 gnsspp::FrameReader reader(port);
