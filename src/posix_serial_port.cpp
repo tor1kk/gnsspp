@@ -32,7 +32,6 @@ speed_t to_baud(int baud)
 PosixSerialPort::PosixSerialPort(const std::string& path, int baudrate)
     : path_(path), baudrate_(baudrate), fd_(-1)
 {
-
 }
 
 
@@ -74,12 +73,12 @@ void PosixSerialPort::open(void)
     tty.c_cflag |=  CS8;          // 8 bit packets
     tty.c_cflag |=  CREAD | CLOCAL;
 
-    tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ISIG);  // raw mode
-    tty.c_iflag &= ~(IXON | IXOFF | IXANY);          // no flow control
-    tty.c_oflag &= ~OPOST;                           // no output proc
+    tty.c_lflag &= ~(ICANON | ECHO | ECHOE | ECHONL | ISIG | IEXTEN);
+    tty.c_iflag &= ~(IGNBRK | BRKINT | PARMRK | ISTRIP | INLCR | IGNCR | ICRNL | IXON | IXOFF | IXANY);
+    tty.c_oflag &= ~OPOST;
 
-    tty.c_cc[VMIN]  = 1;   // wait at least 1 byte
-    tty.c_cc[VTIME] = 0;   // no timeout
+    tty.c_cc[VMIN]  = 1;
+    tty.c_cc[VTIME] = 0;
 
     if (tcsetattr(fd_, TCSANOW, &tty) != 0) {
         ::close(fd_);
@@ -107,6 +106,9 @@ bool PosixSerialPort::is_open(void) const
 
 bool PosixSerialPort::wait_readable(int timeout_ms)
 {
+    if (head_ < tail_)
+        return true;
+
     struct pollfd pfd{};
     pfd.fd     = fd_;
     pfd.events = POLLIN;
@@ -122,27 +124,39 @@ bool PosixSerialPort::wait_readable(int timeout_ms)
 }
 
 
-uint8_t PosixSerialPort::read_byte(void)
+void PosixSerialPort::refill()
 {
-    uint8_t tmp = 0;
-
-    int ret = ::read(fd_, &tmp, 1);
+    int ret = ::read(fd_, buf_, BUF_SIZE);
     if (ret < 0)
         throw IoError(std::string("read failed: ") + strerror(errno));
     if (ret == 0)
         throw IoError("read failed: EOF");
+    head_ = 0;
+    tail_ = static_cast<size_t>(ret);
+}
 
-    return tmp;
+
+uint8_t PosixSerialPort::read_byte(void)
+{
+    if (head_ >= tail_)
+        refill();
+    return buf_[head_++];
 }
 
 
 size_t PosixSerialPort::read(uint8_t* buf, size_t len)
 {
-    int ret = ::read(fd_, buf, len);
-    if (ret < 0) {
-        throw IoError(std::string("read failed: ") + strerror(errno));
+    if (head_ < tail_) {
+        size_t avail = tail_ - head_;
+        size_t n = (len < avail) ? len : avail;
+        std::memcpy(buf, buf_ + head_, n);
+        head_ += n;
+        return n;
     }
 
+    int ret = ::read(fd_, buf, len);
+    if (ret < 0)
+        throw IoError(std::string("read failed: ") + strerror(errno));
     return static_cast<size_t>(ret);
 }
 
