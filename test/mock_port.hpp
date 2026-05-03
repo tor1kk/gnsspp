@@ -44,9 +44,8 @@ public:
         return counter;
     }
 
-    size_t write(const uint8_t* buf, size_t len) override {
+    void write(const uint8_t* buf, size_t len) override {
         written_.insert(written_.end(), buf, buf + len);
-        return len;
     }
 
     const std::vector<uint8_t>& written() const { return written_; }
