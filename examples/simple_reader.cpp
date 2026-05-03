@@ -1,11 +1,14 @@
 // simple_reader.cpp — minimal example: read UBX/NMEA/RTCM3 frames from a
-// serial port and decode the most common message types.
+// serial port or TCP socket and decode the most common message types.
 //
 // Build (after cmake):
 //   cmake --build build --target simple_reader
 //
-// Run:
+// Run (serial):
 //   ./build/simple_reader /dev/ttyACM0 115200
+//
+// Run (TCP):
+//   ./build/simple_reader tcp 192.168.1.10 9000
 
 #include <cstdlib>
 #include <iostream>
@@ -88,27 +91,35 @@ static void handle_rtcm3(const gnsspp::Frame& frame)
 
 int main(int argc, char* argv[])
 {
-    if (argc < 3) {
-        std::cerr << "Usage: " << argv[0] << " <device> <baudrate>\n"
-                  << "  e.g. " << argv[0] << " /dev/ttyACM0 115200\n";
+    std::unique_ptr<gnsspp::Port> port;
+    std::string label;
+
+    if (argc == 3 && std::string(argv[1]) != "tcp") {
+        port  = std::make_unique<gnsspp::PosixSerialPort>(argv[1], std::stoi(argv[2]));
+        label = std::string(argv[1]) + " at " + argv[2] + " baud";
+    } else if (argc == 4 && std::string(argv[1]) == "tcp") {
+        port  = std::make_unique<gnsspp::PosixTcpPort>(argv[2], std::stoi(argv[3]));
+        label = std::string("tcp://") + argv[2] + ":" + argv[3];
+    } else {
+        std::cerr << "Usage:\n"
+                  << "  " << argv[0] << " <device> <baudrate>\n"
+                  << "  " << argv[0] << " tcp <host> <port>\n";
         return EXIT_FAILURE;
     }
-
-    gnsspp::PosixSerialPort port(argv[1], std::stoi(argv[2]));
 
     try {
-        port.open();
+        port->open();
     } catch (const gnsspp::IoError& e) {
-        std::cerr << "Failed to open " << argv[1] << ": " << e.what() << "\n";
+        std::cerr << "Failed to open " << label << ": " << e.what() << "\n";
         return EXIT_FAILURE;
     }
 
-    gnsspp::FrameReader reader(port);
+    gnsspp::FrameReader reader(*port);
     reader.add_parser(std::make_unique<gnsspp::UBXParser>());
     reader.add_parser(std::make_unique<gnsspp::NMEAParser>());
     reader.add_parser(std::make_unique<gnsspp::RTCM3Parser>());
 
-    std::cout << "Reading from " << argv[1] << " at " << argv[2] << " baud...\n";
+    std::cout << "Reading from " << label << "...\n";
 
     while (true) {
         try {
@@ -127,6 +138,6 @@ int main(int argc, char* argv[])
         }
     }
 
-    port.close();
+    port->close();
     return EXIT_SUCCESS;
 }

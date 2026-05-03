@@ -12,6 +12,7 @@
 #include "gnsspp/port.hpp"
 #if defined(__unix__) || defined(__APPLE__)
 #  include "gnsspp/posix_serial_port.hpp"
+#  include "gnsspp/posix_tcp_port.hpp"
 #endif
 
 // Protocol parsers (frame-level)

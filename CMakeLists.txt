@@ -41,6 +41,7 @@ set(GNSSPP_SOURCES
 )
 if(UNIX)
     list(APPEND GNSSPP_SOURCES src/posix_serial_port.cpp)
+    list(APPEND GNSSPP_SOURCES src/posix_tcp_port.cpp)
 endif()
 
 add_library(gnsspp ${GNSSPP_SOURCES})
