@@ -21,7 +21,7 @@ public:
     bool wait_readable(int timeout_ms) override;
     uint8_t read_byte() override;
     size_t read(uint8_t* buf, size_t len) override;
-    size_t write(const uint8_t* buf, size_t len) override;  
+    void write(const uint8_t* buf, size_t len) override;
 
 private:
     static constexpr size_t BUF_SIZE = 1024;

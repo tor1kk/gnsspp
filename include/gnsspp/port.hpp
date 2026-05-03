@@ -24,8 +24,8 @@ public:
     /// Read up to @p len bytes into @p buf. Returns number of bytes read.
     virtual size_t read(uint8_t* buf, size_t len) = 0;
 
-    /// Write @p len bytes from @p buf to the port. Returns number of bytes written.
-    virtual size_t write(const uint8_t* buf, size_t len) = 0;
+    /// Write all @p len bytes from @p buf to the port. Throws IoError on failure.
+    virtual void write(const uint8_t* buf, size_t len) = 0;
 
     /// Block until data is available or timeout expires.
     /// @param timeout_ms  milliseconds to wait; -1 = wait forever.

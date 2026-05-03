@@ -161,14 +161,22 @@ size_t PosixSerialPort::read(uint8_t* buf, size_t len)
 }
 
 
-size_t PosixSerialPort::write(const uint8_t* buf, size_t len)
+void PosixSerialPort::write(const uint8_t* buf, size_t len)
 {
-    int ret = ::write(fd_, buf, len);
-    if (ret < 0) {
-        throw IoError(std::string("write failed: ") + strerror(errno));
+    while (len > 0) {
+        ssize_t n = ::write(fd_, buf, len);
+        if (n < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
+            throw IoError(std::string("write failed: ") + strerror(errno));
+        }
+        if (n == 0) {
+            throw IoError("write failed: wrote 0 bytes");
+        }
+        buf += n;
+        len -= n;
     }
-
-    return static_cast<size_t>(ret);
 }
 
 } // namespace gnsspp

@@ -134,12 +134,22 @@ size_t PosixTcpPort::read(uint8_t* buf, size_t len)
 }
 
 
-size_t PosixTcpPort::write(const uint8_t* buf, size_t len)
+void PosixTcpPort::write(const uint8_t* buf, size_t len)
 {
-    ssize_t ret = ::send(sockfd_, buf, len, MSG_NOSIGNAL);
-    if (ret < 0)
-        throw IoError(std::string("send: ") + strerror(errno));
-    return static_cast<size_t>(ret);
+    while (len > 0) {
+        ssize_t n = ::send(sockfd_, buf, len, MSG_NOSIGNAL);
+        if (n < 0) {
+            if (errno == EINTR) {
+                continue;
+            }
+            throw IoError(std::string("send: ") + strerror(errno));
+        }
+        if (n == 0) {
+            throw IoError("send: wrote 0 bytes");
+        }
+        buf += n;
+        len -= n;
+    }
 }
 
 } // namespace gnsspp
